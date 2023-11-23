@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using ResourceManager.Application.Users;
 
 namespace ResourceManager.Application;
 
@@ -9,7 +10,8 @@ public static class DependencyInjection
         services.AddMediatR(options =>
         {
             options.RegisterServicesFromAssemblyContaining(typeof(DependencyInjection));
-        });
+        }); 
+        
         return services;
     }
 }

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ResourceManager.Application.Users;
+using ResourceManager.Infrastructure.Persistence;
 
 namespace ResourceManager.Infrastructure;
 
@@ -16,6 +18,12 @@ public static class DependencyInjection
             .AddAuth(config)
             .AddSwaggerConfig()
             .AddPersistence();
+    }
+
+    public static IServiceCollection AddPersistence(this IServiceCollection services)
+    {
+        services.AddSingleton<IUsersRepository, UsersRepository>();
+        return services;
     }
 
     public static IServiceCollection AddAuth(this IServiceCollection services, ConfigurationManager config)
@@ -71,11 +79,6 @@ public static class DependencyInjection
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
 
-        return services;
-    }
-
-    public static IServiceCollection AddPersistence(this IServiceCollection services)
-    {
         return services;
     }
 }

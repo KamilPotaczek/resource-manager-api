@@ -21,7 +21,7 @@ public sealed class IdentityController : ControllerBase
     /// <remarks> In a real life scenario this endpoint would be a separate IdentityService </remarks>
     /// <returns> A JWT token with auth information. </returns>
     [HttpPost("token")]
-    public IActionResult GenerateToken([FromBody] TokenGenerationQuery query)
+    public IActionResult GenerateToken([FromBody] GenerateTokenRequest query)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(TokenSecret);
