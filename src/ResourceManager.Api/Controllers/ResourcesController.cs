@@ -30,8 +30,14 @@ public sealed class ResourcesController : ApiController
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _userContextProvider = userContextProvider ?? throw new ArgumentNullException(nameof(userContextProvider));
     }
-
+    
+    /// <summary>
+    /// Creates a new resource with given or auto-generated Id
+    /// </summary>
     [HttpPost]
+    [ProducesResponseType(typeof(ResourceResponse), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Add([FromBody] AddResourceRequest request)
     {
         var user = _userContextProvider.GetUserFromContext();
@@ -47,7 +53,12 @@ public sealed class ResourcesController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Returns existing resource
+    /// </summary>
     [HttpGet("{resourceId:guid}")]
+    [ProducesResponseType(typeof(ResourceResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid resourceId)
     {
         var query = new GetResourceQuery(resourceId);
@@ -59,7 +70,13 @@ public sealed class ResourcesController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Locks a resource for calling user or updates lock period if lock already exists
+    /// </summary>
     [HttpPut("{resourceId:guid}/lock")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LockResource(Guid resourceId, [FromBody] LockResourceRequest request)
     {
         var user = _userContextProvider.GetUserFromContext();
@@ -72,7 +89,13 @@ public sealed class ResourcesController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Unlocks a resource. Only lock owner can unlock a resource
+    /// </summary>
     [HttpPut("{resourceId:guid}/unlock")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> LockResource(Guid resourceId)
     {
         var user = _userContextProvider.GetUserFromContext();
@@ -85,7 +108,13 @@ public sealed class ResourcesController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Withdraws a resource and removes its lock
+    /// </summary>
     [HttpPut("{resourceId:guid}/withdraw")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> WithdrawResource(Guid resourceId)
     {
         var user = _userContextProvider.GetUserFromContext();
@@ -98,6 +127,9 @@ public sealed class ResourcesController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Lists all resources
+    /// </summary>
     [HttpGet]
     public async Task<IActionResult> List()
     {

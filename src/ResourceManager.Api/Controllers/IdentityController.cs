@@ -28,6 +28,8 @@ public sealed class IdentityController : ControllerBase
     /// <remarks> In a real life scenario this endpoint would be a separate IdentityService </remarks>
     /// <returns> A JWT token with auth information. </returns>
     [HttpPost("token")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GenerateToken([FromBody] GenerateTokenRequest query)
     {
         var tokenHandler = new JwtSecurityTokenHandler();

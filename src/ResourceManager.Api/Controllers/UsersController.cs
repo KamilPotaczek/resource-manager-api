@@ -22,10 +22,12 @@ public sealed class UsersController : ApiController
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
+
     /// <summary>
-    /// This endpoint is not protected - get user IDs from here
+    /// Lists all users
     /// </summary>
     [HttpGet]
+    [ProducesResponseType(typeof(List<UserResponse>), StatusCodes.Status200OK)]
     public async Task<IActionResult> List()
     {
         var query = new ListUsersQuery();
@@ -37,8 +39,13 @@ public sealed class UsersController : ApiController
                 ToDto(user.Role)));
         return Ok(users);
     }
-    
+
+    /// <summary>
+    /// Retrieves existing user
+    /// </summary>
     [HttpGet("{userId:guid}")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get(Guid userId)
     {
         var query = new GetUserQuery(userId);
@@ -48,8 +55,14 @@ public sealed class UsersController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Creates a new user with given or auto-generated Id
+    /// </summary>
     [Authorize]
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Add([FromBody] AddUserRequest request)
     {
         if (!DomainUserRole.TryFromName(request.Role.ToString(), out var role))
@@ -71,8 +84,13 @@ public sealed class UsersController : ApiController
             Problem);
     }
 
+    /// <summary>
+    /// Deletes existing user from the database
+    /// </summary>
     [Authorize]
     [HttpDelete("{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid userId)
     {
         var command = new DeleteUserCommand(userId);
