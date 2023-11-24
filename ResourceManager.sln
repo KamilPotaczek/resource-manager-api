@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Domain", "..\itsg-interview-task\src\ResourceManager.Domain\ResourceManager.Domain.csproj", "{6E42D6FB-4002-4594-8791-D9019F435277}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Domain", "src\ResourceManager.Domain\ResourceManager.Domain.csproj", "{6E42D6FB-4002-4594-8791-D9019F435277}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Application", "src\ResourceManager.Application\ResourceManager.Application.csproj", "{52F1DE75-83D7-41C4-BEFC-554F2BD73403}"
 EndProject
