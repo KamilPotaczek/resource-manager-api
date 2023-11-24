@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using ErrorOr;
+using Microsoft.EntityFrameworkCore;
 using ResourceManager.Application.Users;
 using ResourceManager.Domain.Users;
 
@@ -56,5 +58,22 @@ internal sealed class UsersRepository : IUsersRepository
     {
         _dbContext.Users.Add(user);
         return Task.CompletedTask;
+    }
+    
+    public async Task<ErrorOr<Success>> CommitChangesAsync()
+    {
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            return Result.Success;
+        }
+        catch (Exception e)
+        {
+            return e switch
+            {
+                DBConcurrencyException concurrencyException => Error.Conflict(description: concurrencyException.Message),
+                _ => Error.Failure(description: e.Message)
+            };
+        }
     }
 }

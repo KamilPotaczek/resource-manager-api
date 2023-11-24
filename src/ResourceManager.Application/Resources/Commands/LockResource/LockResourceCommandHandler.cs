@@ -6,16 +6,13 @@ namespace ResourceManager.Application.Resources.Commands.LockResource;
 
 internal sealed class LockResourceCommandHandler : IRequestHandler<LockResourceCommand, ErrorOr<Success>>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IResourcesRepository _resourcesRepository;
 
     public LockResourceCommandHandler(
-        IUnitOfWork unitOfWork, 
         IDateTimeProvider dateTimeProvider,
         IResourcesRepository resourcesRepository)
     {
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _resourcesRepository = resourcesRepository ?? throw new ArgumentNullException(nameof(resourcesRepository));
     }
@@ -33,7 +30,6 @@ internal sealed class LockResourceCommandHandler : IRequestHandler<LockResourceC
         if (result.IsError) return result;
         
         await _resourcesRepository.UpdateAsync(resource);
-        await _unitOfWork.CommitChangesAsync();
-        return Result.Success;
+        return await _resourcesRepository.CommitChangesAsync();
     }
 }

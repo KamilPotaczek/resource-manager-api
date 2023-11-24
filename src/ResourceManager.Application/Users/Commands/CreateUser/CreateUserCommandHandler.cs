@@ -7,12 +7,10 @@ namespace ResourceManager.Application.Users.Commands.CreateUser;
 internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ErrorOr<User>>
 {
     private readonly IUsersRepository _usersRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateUserCommandHandler(IUsersRepository usersRepository, IUnitOfWork unitOfWork)
+    public CreateUserCommandHandler(IUsersRepository usersRepository)
     {
         _usersRepository = usersRepository ?? throw new ArgumentNullException(nameof(usersRepository));
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<ErrorOr<User>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -22,7 +20,10 @@ internal sealed class CreateUserCommandHandler : IRequestHandler<CreateUserComma
 
         var user = new User(request.Email, request.Role);
         await _usersRepository.AddAsync(user);
-        await _unitOfWork.CommitChangesAsync();
-        return user;
+        var result = await _usersRepository.CommitChangesAsync();
+        
+        return result.Match<ErrorOr<User>>(
+            _ => user,
+            error => error);
     }
 }

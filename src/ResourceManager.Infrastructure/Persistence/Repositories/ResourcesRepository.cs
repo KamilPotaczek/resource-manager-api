@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data;
+using ErrorOr;
+using Microsoft.EntityFrameworkCore;
 using ResourceManager.Application.Resources;
 using ResourceManager.Domain.Resources;
 
@@ -15,7 +17,9 @@ internal sealed class ResourcesRepository : IResourcesRepository
 
     public async Task<List<Resource>> ListAsync()
     {
-        return await _dbContext.Resources.ToListAsync();
+        return await _dbContext.Resources
+            .Include(res => res.ResourceLock)
+            .ToListAsync();
     }
 
     public async Task<Resource?> GetByIdAsync(Guid id)
@@ -50,7 +54,8 @@ internal sealed class ResourcesRepository : IResourcesRepository
 
         if (resource.ResourceLock == null)
         {
-            var resourceLock = await _dbContext.ResourceLocks.FirstOrDefaultAsync(rl => rl.ResourceId == resource.Id);
+            var resourceLock = await _dbContext.ResourceLocks
+                .FirstOrDefaultAsync(rl => rl.ResourceId == resource.Id);
             if (resourceLock is not null)
                 _dbContext.Remove(resourceLock);
             return;
@@ -58,7 +63,7 @@ internal sealed class ResourcesRepository : IResourcesRepository
 
         await UpsertAsync(resource.ResourceLock);
     }
-    
+
     private async Task UpsertAsync(ResourceLock resourceLock)
     {
         var existingLock = await _dbContext.ResourceLocks
@@ -72,5 +77,21 @@ internal sealed class ResourcesRepository : IResourcesRepository
 
         await _dbContext.ResourceLocks.AddAsync(resourceLock);
     }
-    
+
+    public async Task<ErrorOr<Success>> CommitChangesAsync()
+    {
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            return Result.Success;
+        }
+        catch (Exception e)
+        {
+            return e switch
+            {
+                DBConcurrencyException concurrencyException => Error.Conflict(description: concurrencyException.Message),
+                _ => Error.Failure(description: e.Message)
+            };
+        }
+    }
 }

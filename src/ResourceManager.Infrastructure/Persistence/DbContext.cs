@@ -1,12 +1,11 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using ResourceManager.Application;
 using ResourceManager.Domain.Resources;
 using ResourceManager.Domain.Users;
 
 namespace ResourceManager.Infrastructure.Persistence;
 
-internal sealed class ResourceManagerDbContext : DbContext, IUnitOfWork
+internal sealed class ResourceManagerDbContext : DbContext
 {
     public DbSet<User> Users { get; set; } = null!;
     public DbSet<Resource> Resources { get; set; } = null!;
@@ -19,7 +18,7 @@ internal sealed class ResourceManagerDbContext : DbContext, IUnitOfWork
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-        
+
         base.OnModelCreating(modelBuilder);
     }
 

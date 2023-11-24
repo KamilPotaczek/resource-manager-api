@@ -1,4 +1,5 @@
-﻿using ResourceManager.Domain.Users;
+﻿using ErrorOr;
+using ResourceManager.Domain.Users;
 
 namespace ResourceManager.Application.Users;
 
@@ -11,4 +12,5 @@ public interface IUsersRepository
     Task<bool> ExistsAsync(string email);
     Task RemoveAsync(User user);
     Task AddAsync(User user);
+    Task<ErrorOr<Success>> CommitChangesAsync();
 }

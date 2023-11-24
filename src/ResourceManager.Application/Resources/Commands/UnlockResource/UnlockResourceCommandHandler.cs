@@ -8,16 +8,13 @@ internal sealed class UnlockResourceCommandHandler : IRequestHandler<UnlockResou
 {
     private readonly IResourcesRepository _resourcesRepository;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IUnitOfWork _unitOfWork;
 
     public UnlockResourceCommandHandler(
         IResourcesRepository resourcesRepository,
-        IDateTimeProvider dateTimeProvider,
-        IUnitOfWork unitOfWork)
+        IDateTimeProvider dateTimeProvider)
     {
         _resourcesRepository = resourcesRepository ?? throw new ArgumentNullException(nameof(resourcesRepository));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<ErrorOr<Success>> Handle(UnlockResourceCommand request, CancellationToken cancellationToken)
@@ -31,7 +28,6 @@ internal sealed class UnlockResourceCommandHandler : IRequestHandler<UnlockResou
             return result;
 
         await _resourcesRepository.UpdateAsync(resource);
-        await _unitOfWork.CommitChangesAsync();
-        return Result.Success;
+        return await _resourcesRepository.CommitChangesAsync();
     }
 }

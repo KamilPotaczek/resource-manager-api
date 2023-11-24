@@ -22,23 +22,23 @@ public sealed class ResourcesController : ApiController
 {
     private readonly ISender _mediator;
     private readonly IDateTimeProvider _dateTimeProvider;
-    private readonly IHttpContextAccessor _contextAccessor;
+    private readonly IUserContextProvider _userContextProvider;
 
-    public ResourcesController(ISender mediator, IDateTimeProvider dateTimeProvider, IHttpContextAccessor contextAccessor)
+    public ResourcesController(ISender mediator, IDateTimeProvider dateTimeProvider, IUserContextProvider userContextProvider)
     {
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-        _contextAccessor = contextAccessor ?? throw new ArgumentNullException(nameof(contextAccessor));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _userContextProvider = userContextProvider ?? throw new ArgumentNullException(nameof(userContextProvider));
     }
 
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddResourceRequest request)
     {
-        var userContext = GetUserFromContext();
-        if (userContext.Role != UserRole.Admin)
+        var user = _userContextProvider.GetUserFromContext();
+        if (user.Role != UserRole.Admin)
             return Problem(Error.Unauthorized(description: "Only Admin user can create a resource"));
 
-        var command = new CreateResourceCommand(request.Id, userContext.Role);
+        var command = new CreateResourceCommand(request.Id, user.Role);
 
         var createdResult = await _mediator.Send(command);
 
@@ -62,7 +62,7 @@ public sealed class ResourcesController : ApiController
     [HttpPut("{resourceId:guid}/lock")]
     public async Task<IActionResult> LockResource(Guid resourceId, [FromBody] LockResourceRequest request)
     {
-        var user = GetUserFromContext();
+        var user = _userContextProvider.GetUserFromContext();
         var command = new LockResourceCommand(user, resourceId, request.Until);
 
         var result = await _mediator.Send(command);
@@ -75,7 +75,7 @@ public sealed class ResourcesController : ApiController
     [HttpPut("{resourceId:guid}/unlock")]
     public async Task<IActionResult> LockResource(Guid resourceId)
     {
-        var user = GetUserFromContext();
+        var user = _userContextProvider.GetUserFromContext();
         var command = new UnlockResourceCommand(user, resourceId);
 
         var result = await _mediator.Send(command);
@@ -88,8 +88,7 @@ public sealed class ResourcesController : ApiController
     [HttpPut("{resourceId:guid}/withdraw")]
     public async Task<IActionResult> WithdrawResource(Guid resourceId)
     {
-        var userContext = GetUserFromContext();
-        var user = new User(userContext.Email, userContext.Role, userContext.Id);
+        var user = _userContextProvider.GetUserFromContext();
         var command = new WithdrawResourceCommand(user, resourceId);
 
         var result = await _mediator.Send(command);
@@ -107,16 +106,6 @@ public sealed class ResourcesController : ApiController
         var result = await _mediator.Send(query);
 
         return Ok(result.Select(ToDto));
-    }
-
-    private User GetUserFromContext()
-    {
-        var claims = _contextAccessor.HttpContext!.User.Claims.ToList();
-
-        var id = Guid.Parse(claims.First(claim => claim.Type == "userId").Value);
-        var role = UserRole.FromName(claims.First(claim => claim.Type == "userRole").Value);
-        var email = claims.First(claim => claim.Type == "userEmail").Value;
-        return new User(email, role, id);
     }
 
     private ResourceResponse ToDto(Resource resource)

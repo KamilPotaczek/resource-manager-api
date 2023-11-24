@@ -28,8 +28,6 @@ public static class DependencyInjection
         services.AddDbContext<ResourceManagerDbContext>(options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
         services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<IResourcesRepository, ResourcesRepository>();
-        services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<ResourceManagerDbContext>());
-
         return services;
     }
 

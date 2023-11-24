@@ -7,12 +7,10 @@ namespace ResourceManager.Application.Resources.Commands.CreateResource;
 internal sealed class CreateResourceCommandHandler : IRequestHandler<CreateResourceCommand, ErrorOr<Resource>>
 {
     private readonly IResourcesRepository _resourcesRepository;
-    private readonly IUnitOfWork _unitOfWork;
 
-    public CreateResourceCommandHandler(IResourcesRepository resourcesRepository, IUnitOfWork unitOfWork)
+    public CreateResourceCommandHandler(IResourcesRepository resourcesRepository)
     {
         _resourcesRepository = resourcesRepository ?? throw new ArgumentNullException(nameof(resourcesRepository));
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
     }
 
     public async Task<ErrorOr<Resource>> Handle(CreateResourceCommand request, CancellationToken cancellationToken)
@@ -22,7 +20,9 @@ internal sealed class CreateResourceCommandHandler : IRequestHandler<CreateResou
 
         var resource = new Resource(request.ResourceId);
         await _resourcesRepository.AddAsync(resource);
-        await _unitOfWork.CommitChangesAsync();
-        return resource;
+        var result = await _resourcesRepository.CommitChangesAsync();
+        return result.Match<ErrorOr<Resource>>(
+            _ => resource,
+            error => error);
     }
 }

@@ -1,3 +1,5 @@
+using Microsoft.Identity.Client;
+using ResourceManager.Api;
 using ResourceManager.Application;
 using ResourceManager.Infrastructure;
 
@@ -14,6 +16,7 @@ builder.Services
     .AddApplication();
 
 builder.Services
+    .AddScoped<IUserContextProvider, UserContextProvider>()
     .AddAuthorization();
 
 var app = builder.Build();

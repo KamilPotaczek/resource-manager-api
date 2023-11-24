@@ -5,12 +5,10 @@ namespace ResourceManager.Application.Resources.Commands.WithdrawResource;
 
 internal sealed class WithdrawResourceCommandHandler : IRequestHandler<WithdrawResourceCommand, ErrorOr<Success>>
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IResourcesRepository _resourcesRepository;
 
-    public WithdrawResourceCommandHandler(IUnitOfWork unitOfWork, IResourcesRepository resourcesRepository)
+    public WithdrawResourceCommandHandler(IResourcesRepository resourcesRepository)
     {
-        _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         _resourcesRepository = resourcesRepository ?? throw new ArgumentNullException(nameof(resourcesRepository));
     }
 
@@ -26,7 +24,6 @@ internal sealed class WithdrawResourceCommandHandler : IRequestHandler<WithdrawR
             return result;
 
         await _resourcesRepository.UpdateAsync(resource);
-        await _unitOfWork.CommitChangesAsync();
-        return Result.Success;
+        return await _resourcesRepository.CommitChangesAsync();
     }
 }

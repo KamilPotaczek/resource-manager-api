@@ -14,7 +14,7 @@ public static class ResourceErrors
 
     public static readonly Error CannotUnlockResourceLockedByAnotherUser = Error.Validation(
         "Resource.CannotUnlockResourceLockedByAnotherUser",
-        "Cannot lock a resource locked by another user");
+        "Cannot unlock a resource locked by another user");
     
     public static readonly Error CannotLockResourceWithPastEndDate = Error.Validation(
         "Resource.CannotLockResourceWithPastEndDate",
