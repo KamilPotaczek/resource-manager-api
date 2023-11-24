@@ -10,6 +10,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Api", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Contracts", "src\ResourceManager.Contracts\ResourceManager.Contracts.csproj", "{71D68AE3-5643-40F0-BFF2-5AE5AD42A4F7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F18D4EB5-408F-4501-BDDB-B3C84DF3CB9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManager.Domain.Tests.Unit", "tests\ResourceManager.Domain.Tests.Unit\ResourceManager.Domain.Tests.Unit.csproj", "{82F7124C-0477-46E6-8C99-05D2391536C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,12 @@ Global
 		{71D68AE3-5643-40F0-BFF2-5AE5AD42A4F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71D68AE3-5643-40F0-BFF2-5AE5AD42A4F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71D68AE3-5643-40F0-BFF2-5AE5AD42A4F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F7124C-0477-46E6-8C99-05D2391536C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F7124C-0477-46E6-8C99-05D2391536C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F7124C-0477-46E6-8C99-05D2391536C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F7124C-0477-46E6-8C99-05D2391536C1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{82F7124C-0477-46E6-8C99-05D2391536C1} = {F18D4EB5-408F-4501-BDDB-B3C84DF3CB9D}
 	EndGlobalSection
 EndGlobal

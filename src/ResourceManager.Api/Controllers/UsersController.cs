@@ -11,10 +11,9 @@ using User = ResourceManager.Domain.Users.User;
 
 namespace ResourceManager.Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("[controller]")]
-public class UsersController : ApiController
+public sealed class UsersController : ApiController
 {
     private readonly ISender _mediator;
 
@@ -23,6 +22,9 @@ public class UsersController : ApiController
         _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
+    /// <summary>
+    /// This endpoint is not protected - get user IDs from here
+    /// </summary>
     [HttpGet]
     public async Task<IActionResult> List()
     {
@@ -35,7 +37,7 @@ public class UsersController : ApiController
                 ToDto(user.Role)));
         return Ok(users);
     }
-
+    
     [HttpGet("{userId:guid}")]
     public async Task<IActionResult> Get(Guid userId)
     {
@@ -46,7 +48,7 @@ public class UsersController : ApiController
             Problem);
     }
 
-
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Add([FromBody] AddUserRequest request)
     {
@@ -69,6 +71,7 @@ public class UsersController : ApiController
             Problem);
     }
 
+    [Authorize]
     [HttpDelete("{userId:guid}")]
     public async Task<IActionResult> Delete(Guid userId)
     {

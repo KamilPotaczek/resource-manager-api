@@ -10,4 +10,5 @@ public class UserRole : SmartEnum<UserRole>
     public UserRole(string name, int value) : base(name, value)
     {
     }
+    
 }

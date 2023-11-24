@@ -1,12 +1,15 @@
-﻿using System.Reflection;
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ResourceManager.Application;
+using ResourceManager.Application.Resources;
 using ResourceManager.Application.Users;
 using ResourceManager.Infrastructure.Persistence;
+using ResourceManager.Infrastructure.Persistence.Repositories;
 
 namespace ResourceManager.Infrastructure;
 
@@ -20,13 +23,17 @@ public static class DependencyInjection
             .AddPersistence();
     }
 
-    public static IServiceCollection AddPersistence(this IServiceCollection services)
+    private static IServiceCollection AddPersistence(this IServiceCollection services)
     {
-        services.AddSingleton<IUsersRepository, UsersRepository>();
+        services.AddDbContext<ResourceManagerDbContext>(options => options.UseSqlServer("name=ConnectionStrings:DefaultConnection"));
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<IResourcesRepository, ResourcesRepository>();
+        services.AddScoped<IUnitOfWork>(serviceProvider => serviceProvider.GetRequiredService<ResourceManagerDbContext>());
+
         return services;
     }
 
-    public static IServiceCollection AddAuth(this IServiceCollection services, ConfigurationManager config)
+    private static IServiceCollection AddAuth(this IServiceCollection services, ConfigurationManager config)
     {
         services.AddAuthentication(x =>
         {
@@ -51,7 +58,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
+    private static IServiceCollection AddSwaggerConfig(this IServiceCollection services)
     {
         services.AddSwaggerGen(options =>
         {
